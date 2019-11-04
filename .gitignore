@@ -1,0 +1,7 @@
+__pycache__/
+.venv/
+.vscode/
+*.py[cod]
+*$py.class
+secrets.json
+*.db
