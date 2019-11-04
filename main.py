@@ -1,4 +1,4 @@
-from flask import Flask, render_template, 
+from flask import Flask, render_template, session, request
 import json
 import database
 
@@ -19,7 +19,7 @@ else:
 
 @app.route('/')
 def index():
-    return 'Hello, world!'
+    return render_template('index.html')
 
 # Launch the application
 app.run(
