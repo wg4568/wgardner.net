@@ -1,9 +1,11 @@
-from flask import Flask, render_template, session, request
+from flask import Flask, render_template, session, request, redirect, abort
 import json
 import database
+import os
 
 # Initialize globals
 app = Flask(__name__)
+pages = [ a.split('.')[0] for a in os.listdir('templates/site') ]
 db = database.Database('database.db', schema='resources/schema.sql')
 
 # Load configuration from file
@@ -19,7 +21,12 @@ else:
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return redirect('/site/home')
+
+@app.route('/site/<page>')
+def site(page):
+    if page not in pages: abort(404)
+    else: return render_template('site/%s.html' % page)
 
 # Launch the application
 app.run(
