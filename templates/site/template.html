@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+
+        <title>William Gardner | {{ title }}</title>
+    </head>
+
+    <style>
+        html, body {
+            height: 100%;
+        }
+
+        .background {
+            margin-bottom: -9999px;
+            padding-bottom: 9999px;
+            width: 100%;
+        }
+
+        .selected {
+            color: red;
+        }
+
+        .selected:hover {
+            color: red;
+        }
+        
+        .container {
+            min-height: 100%;
+            overflow: hidden;
+        }
+    </style>
+
+    <body>
+        <div class="container background shadow">
+            <nav class="navbar navbar-expand-lg mx-0 pb-0">
+                <span class="navbar-brand">William Gardner</span>
+
+                <div class="collapse navbar-collapse">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link {%if page=='about'%}selected{%endif%}" href="/site/about"><i class="mr-1 icon-home"></i>About</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {%if page=='services'%}selected{%endif%}" href="/site/services"><i class="mr-1 icon-book"></i>Services</a>
+                        </li>
+            
+                        <li class="nav-item">
+                            <a class="nav-link {%if page=='portfolio'%}selected{%endif%}" href="/site/portfolio"><i class="mr-1 icon-folder-open"></i>Portfolio</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {%if page=='contact'%}selected{%endif%}" href="/site/contact"><i class="mr-1 icon-envelope"></i>Contact</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <hr/>
+
+            <div class="container">
+                {{ content | safe }}
+            </div>
+        </div>
+
+        <script src="/static/js/popper.min.js"></script>
+        <script src="/static/js/jquery-3.4.1.min.js"></script>
+        <script src="/static/js/bootstrap.min.js"></script>
+    </body>
+</html>
