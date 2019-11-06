@@ -2,7 +2,7 @@ CREATE TABLE users (
     username        TEXT NOT NULL UNIQUE,
     password        TEXT NOT NULL,
     liked_posts     TEXT NOT NULL,
-    admin           INTEGER DEFAULT 0
+    admin           INTEGER NOT NULL
 );
 
 CREATE TABLE posts (
@@ -20,5 +20,5 @@ CREATE TABLE comments (
     post_pkey       TEXT NOT NULL,
     username        TEXT NOT NULL,
     create_date     INTEGER NOT NULL,
-    content         TEXT
+    content         TEXT NOT NULL
 );

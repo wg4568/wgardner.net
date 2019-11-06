@@ -26,7 +26,7 @@ with open('resources/config.json') as f:
 # Generate secure secret key for session encryption
 if config['debug']:
     app.secret_key = 'super_secret_debug_key'
-    db.debug = True
+    forum_db.debug = True
 else:
     app.secret_key = secrets.token_hex(config['secret_length'])
 

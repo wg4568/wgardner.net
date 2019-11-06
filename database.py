@@ -14,6 +14,48 @@ def with_database(func):
     return wrapped
 
 class Forum:
+    class Post:
+        def __init__(self, raw):
+            self._raw = raw
+            self.pkey = raw[0]
+            self.created = raw[1]
+            self.username = raw[2]
+            self.title = raw[3]
+            self.content = raw[4]
+            self.likes = raw[5]
+            self.deleted = bool(raw[6])
+            self.image = raw[7]
+        
+        def __repr__(self):
+            return 'Post(%s, %s, \'%s\')' % (self.pkey, self.username, self.title)
+    
+    class User:
+        def __init__(self, raw):
+            self._raw = raw
+            self.username = raw[0]
+            self.password = raw[1]
+            self.admin = bool(raw[3])
+
+            self.liked_posts = raw[2].split(',')
+            if not self.liked_posts[0]: self.liked_posts = []
+        
+        def __repr__(self):
+            if self.admin:
+                return 'User(%s, %s, admin)' % (self.username, len(self.liked_posts))
+            else:
+                return 'User(%s, %s)' % (self.username, len(self.liked_posts))
+    
+    class Comment:
+        def __init__(self, raw):
+            self._raw = raw
+            self.post_pkey = raw[0]
+            self.username = raw[1]
+            self.create_date = raw[2]
+            self.content = raw[3]
+        
+        def __repr__(self):
+            return 'Comment(%s, \'%s\', %s)' % (self.username, self.content, self.post_pkey)
+
     def __init__(self, path, schema='schema.sql', debug=False):
         self.path = path
         self.schema = open(schema, 'r').read()
@@ -51,10 +93,11 @@ class Forum:
         return security.check_password_hash(results[0][0], password)
     
     @with_database
-    def user_admin(self, cur, username):
-        query = 'SELECT COUNT(*) FROM users WHERE username=? AND admin=1'
+    def user_fetch(self, cur, username):
+        query = 'SELECT * FROM users WHERE username=?'
         resp = cur.execute(query, (username,))
-        return bool(resp.fetchone()[0])
+
+        return Forum.User(resp.fetchone())
     
     # OPERATIONS: posts
     @with_database
@@ -78,30 +121,44 @@ class Forum:
     def post_delete(self, cur, post_pkey, deleted=True):
         query = 'UPDATE posts SET deleted=? WHERE post_pkey=?'
         cur.execute(query, (deleted, post_pkey))
-    
+
     @with_database
-    def post_gather(self, quantity, deleted=False):
+    def post_fetch(self, cur, post_pkey):
+        query = 'SELECT * FROM posts WHERE post_pkey=?'
+        resp = cur.execute(query, (post_pkey,))
+
+        return Forum.Post(resp.fetchone())
+
+    @with_database
+    def post_gather(self, cur, quantity, deleted=False):
         query = 'SELECT * FROM posts WHERE deleted!=? ORDER BY create_date DESC LIMIT ?'
-        resp = cur.execute(query, (deleted, quantity))
-        return resp.fetchall()
-    
+        resp = cur.execute(query, (not deleted, quantity))
+        return [ Forum.Post(a) for a in resp.fetchall() ]
+ 
     @with_database
     def post_like(self, cur, username, post_pkey):
-        query = 'SELECT liked_posts FROM users WHERE username=?'
-        resp = cur.execute(query, (username,))
+        liked_posts = self.user_fetch(username).liked_posts
 
-        liked_posts = resp.fetchone()[0].split(',')
-        if not liked_posts[0]: liked_posts = []
-        if post_pkey in liked_posts: return
+        if post_pkey in liked_posts: return False
         else: liked_posts = ','.join(liked_posts + [post_pkey])
 
         query = 'UPDATE users SET liked_posts=? WHERE username=?'
         cur.execute(query, (liked_posts, username))
 
-        # query = ''
+        query = 'UPDATE posts SET likes=likes+1 WHERE post_pkey=?'
+        cur.execute(query, (post_pkey,))
 
-db = Forum('db.db', schema='resources/schema.sql')
-# db.user_create('wg4568', 'password')
-# db.post_create('wg4568', 'Cool Post', 'so like I wanna do this and that\nand also coool!')
-
-db.post_like('wg4568', 'WG41911062')
+        return True
+    
+    # OPERATIONS: comments
+    @with_database
+    def comment_add(self, cur, post_pkey, username, content):
+        create_date = int(time.time())
+        query = 'INSERT INTO comments VALUES (?, ?, ?, ?, ?)'
+        cur.execute(query, (post_pkey, username, create_date, content, false))
+    
+    @with_database
+    def comment_fetch(self, cur, post_pkey, limit=100):
+        query = 'SELECT * FROM comments WHERE post_pkey=? ORDER BY create_date DESC LIMIT ?'
+        resp = cur.execute(query, (post_pkey, limit))
+        return [ Forum.Comment(a) for a in resp.fetchall() ]
