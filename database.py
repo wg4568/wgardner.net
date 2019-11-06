@@ -72,18 +72,19 @@ class Forum:
     
     # OPERATIONS: users
     @with_database
-    def user_exists(self, cur, username):
-        query = 'SELECT COUNT(*) WHERE username=?'
-        resp = cur.execute(query, (username,))
-        return bool(resp.fetchone()[0])
-
-    @with_database
-    def user_create(self, cur, username, password, admin=False):
+    def user_add(self, cur, username, password, admin=False):
         hashed = security.generate_password_hash(password)
 
         query = 'INSERT INTO users VALUES (?, ?, ?, ?)'
         cur.execute(query, (username, hashed, '', admin))
-    
+
+    @with_database
+    def user_fetch(self, cur, username):
+        query = 'SELECT * FROM users WHERE username=?'
+        resp = cur.execute(query, (username,))
+
+        return Forum.User(resp.fetchone())
+
     @with_database
     def user_validate(self, cur, username, password):
         query = 'SELECT password FROM users WHERE username=?'
@@ -91,17 +92,16 @@ class Forum:
         results = resp.fetchall()
         if not len(results): return False
         return security.check_password_hash(results[0][0], password)
-    
-    @with_database
-    def user_fetch(self, cur, username):
-        query = 'SELECT * FROM users WHERE username=?'
-        resp = cur.execute(query, (username,))
 
-        return Forum.User(resp.fetchone())
+    @with_database
+    def user_exists(self, cur, username):
+        query = 'SELECT COUNT(*) WHERE username=?'
+        resp = cur.execute(query, (username,))
+        return bool(resp.fetchone()[0])
     
     # OPERATIONS: posts
     @with_database
-    def post_create(self, cur, username, title, content, image=None, likes=0):
+    def post_add(self, cur, username, title, content, image=None, likes=0):
         pkey_first = username[:3].upper() + time.strftime('%y%m%d')
 
         query = 'SELECT COUNT(*) FROM posts WHERE post_pkey LIKE ?'
@@ -118,11 +118,6 @@ class Forum:
         ))
     
     @with_database
-    def post_delete(self, cur, post_pkey, deleted=True):
-        query = 'UPDATE posts SET deleted=? WHERE post_pkey=?'
-        cur.execute(query, (deleted, post_pkey))
-
-    @with_database
     def post_fetch(self, cur, post_pkey):
         query = 'SELECT * FROM posts WHERE post_pkey=?'
         resp = cur.execute(query, (post_pkey,))
@@ -134,6 +129,11 @@ class Forum:
         query = 'SELECT * FROM posts WHERE deleted!=? ORDER BY create_date DESC LIMIT ?'
         resp = cur.execute(query, (not deleted, quantity))
         return [ Forum.Post(a) for a in resp.fetchall() ]
+
+    @with_database
+    def post_delete(self, cur, post_pkey, deleted=True):
+        query = 'UPDATE posts SET deleted=? WHERE post_pkey=?'
+        cur.execute(query, (deleted, post_pkey))
  
     @with_database
     def post_like(self, cur, username, post_pkey):
