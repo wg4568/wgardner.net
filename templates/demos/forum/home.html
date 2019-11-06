@@ -1,163 +1,52 @@
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<form class="card" method="POST" hidden>
+    <h5 class="card-header">New Post</h5>
 
-        <link rel="stylesheet" href="/static/css/bootstrap.min.css">
-        <link rel="stylesheet" href="/static/css/font-awesome.min.css">
-
-        <title>William Gardner | Demo Forum</title>
-    </head>
-
-    <style>
-        body {
-            margin-top: 10px;
-        }
-    </style>
-
-    <body>
-        <div class="container">
-            <!-- HEADER -->
-            <div class="row">
-                <!-- title -->
-                <div class="col-md-9">
-                    <h1>Live Demo Forum</h1>
-                </div>
-
-                <!-- doctor actions -->
-                <div class="col-md-3">
-                    <div class="btn-group float-right">
-                        <div class="border border-secondary rounded-left px-2">
-                            👤 {{ username }}
-                        </div>
-                        <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" id="doctor" data-toggle="dropdown"></button>
-                        <div class="dropdown-menu dropdown-menu-right">
-                            <a class="dropdown-item" href="/demos/forum/logout">Logout</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- BREADCRUMBS -->
-            <nav>
-                <ol class="pb-0 breadcrumb breadcrumb-transparent">
-                    <li class="breadcrumb-item active"><a href="/home">Home</a></li>
-                </ol>
-            </nav>
-
-            <hr/>
-
-            <!-- TOOLBAR -->
-            <div class="row">
-                <!-- search -->
-                <form class="col-md-9" method="GET">
-                    <div class="input-group">
-                        <input type="text" class="form-control" name="query" placeholder="Search..." value="{{ query }}">
-                        <input type="hidden" name="sort_by" value="{{ sort_by }}">
-                        <input type="hidden" name="reverse" value="{{ reverse }}">
-                        <div class="input-group-append">
-                            <button class="btn btn-primary" type="submit">Search</button>
-                        </div>
-                    </div>
-                </form>
-                
-                <!-- buttons -->
-                <div class="col-md-3">
-                    <div class="float-right">
-                        <a href="/patient/new"><button class="btn btn-success">New Patient</button></a>
-                        <a href="/reports"><button class="btn btn-secondary">Reports</button></a>
-                    </div>
-                </div>
-            </div>
-            
-            <br/>
-
-            <div class="alert alert-warning alert-dismissible fade show" role="alert" id="alert" hidden>
-                <span id="alert-msg"></span>
-                <button type="button" class="close" data-dismiss="alert">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-
-            <!-- PATIENT LIST -->
-            <div>
-                {% if truncated %}
-                    <p><i>results truncated ({{ result_len }} found, {{ max_results }} shown)</i></p>
-                {% endif %}
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th id="header-pkey" class="table-fixed sortable" scope="col">
-                                <i class="{{ sort_data[0] }}"></i>
-                                Pkey
-                            </th>
-
-                            <th id="header-first" class="table-fixed sortable" scope="col">
-                                <i class="{{ sort_data[1] }}"></i>
-                                First
-                            </th>
-
-                            <th id="header-last" class="table-fixed sortable" scope="col">
-                                <i class="{{ sort_data[2] }}"></i>
-                                Last
-                            </th>
-
-                            <th class="table-fixed" scope="col">DOB</th>
-                            <th scope="col">Address</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for user in users %}
-                            <tr>
-                                <td><a href="/patient/{{ user[2] }}">{{ user[2] }}</a></td>
-                                <td>{{ user[4] }}</td>
-                                <td>{{ user[3] }}</td>
-                                <td>{{ user[6] }}</td>
-                                <td>{{ user[9] }}, {{ user[10] }}</td>
-                            </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+    <div class="card-body">
+        <div class="form-group row">
+            <label class="col-md-2 col-form-label col-form-label-md">Post Title</label>
+    
+            <div class="col-md-10">
+                <input class="form-control form-control-md" placeholder="Title..." required>
             </div>
         </div>
     
-        <script src="/static/js/popper.min.js"></script>
-        <script src="/static/js/jquery-3.4.1.min.js"></script>
-        <script src="/static/js/bootstrap.min.js"></script>
+        <div class="form-group row">
+            <label class="col-md-2 col-form-label col-form-label-md">Post Body</label>
+    
+            <div class="col-md-10">
+                <textarea class="form-control form-control-md" placeholder="Content..." required></textarea>
+            </div>
+        </div>
+    
+        <div class="form-group row">
+            <label class="col-md-2 col-form-label col-form-label-md">Image URL</label>
+    
+            <div class="col-md-10">
+                <input type="url" class="form-control form-control-md" placeholder="Image...">
+            </div>
+        </div>            
 
-        <!-- SORTING AND ALERT SCRIPT -->
-        <script>
-            var params = new URLSearchParams(window.location.search)
-            var query = ''
-            var sort_by = 'patient_key'
-            var reverse = false
-            if (params.has('query')) query = params.get('query')
-            if (params.has('sort_by')) sort_by = params.get('sort_by')
-            if (params.has('reverse')) reverse = params.get('reverse') == 'true'
-            console.log('{{ sort_data }}')
-            $('#header-pkey').click(() => {
-                if (sort_by == 'patient_key') reverse = !reverse
-                else reverse = false
-                console.log(query, sort_by, reverse)
-                window.location.href = `/home?query=${query}&sort_by=patient_key&reverse=${reverse}`;
-            })
-            $('#header-first').click(() => {
-                if (sort_by == 'first_name') reverse = !reverse
-                else reverse = false
-                console.log(query, sort_by, reverse)
-                window.location.href = `/home?query=${query}&sort_by=first_name&reverse=${reverse}`;
-            })
-            $('#header-last').click(() => {
-                if (sort_by == 'last_name') reverse = !reverse
-                else reverse = false
-                console.log(query, sort_by, reverse)
-                window.location.href = `/home?query=${query}&sort_by=last_name&reverse=${reverse}`;
-            })
-            if (params.has('alert')) {
-                $('#alert').attr('hidden', false)
-                $('#alert-msg').text(params.get('alert'))
-            }
-        </script>
-    </body>
-</html>
+        <div class="form-group row">
+            <div class="col-md-2"></div>
+            <div class="col-sm-10">
+                <button type="submit" class="btn btn-primary">Post</button>
+                <button class="btn btn-outline-danger">Cancel</button>
+            </div>
+        </div>
+    </div>
+</form>
+
+<span class="h5">Recent Posts</span>
+<button class="btn btn-sm btn-outline-primary ml-2">New Post</button>
+<br/><br/>
+
+{% for post in posts %}
+<div class="card" style="width: 18rem;">
+    <img class="card-img-top" width="100%" src="https://cdn.photographylife.com/wp-content/uploads/2016/06/Brown-Anole.jpg">
+    <div class="card-body">
+        <a href="/demos/forum/post/pkey" class="h5 card-title">Post Title</a>
+        <h6 class="card-subtitle mt-1 mb-2 text-muted">username</h6>
+        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+    </div>
+</div>
+{% endfor %}

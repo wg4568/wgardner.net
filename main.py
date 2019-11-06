@@ -58,13 +58,15 @@ def demos_stocks():
 
         price_el = soup.find('meta', {'name': 'price'})
         change_el = soup.find('meta', {'name': 'priceChangePercent'})
+        name_el = soup.find('meta', {'name': 'name'})
 
-        if not price_el or not change_el: abort(400)
+        if not price_el or not change_el or not name_el: abort(400)
 
         price = float(price_el['content'].replace(',',''))
         change = float(change_el['content'].replace('%',''))
+        name = name_el['content']
 
-        return json.dumps({'price': price, 'change': change})
+        return json.dumps({'price': price, 'change': change, 'name': name})
     else:
         abort(405)
 
@@ -77,6 +79,14 @@ def forum_require_auth(func):
             return redirect('/demos/forum/login')
     wrapper.__name__ = func.__name__
     return wrapper
+
+def render_forum_template(template, **kwargs):
+    page = template.split('.')[-2].split('/')[-1]
+    page_title = page.capitalize()
+    content = render_template(template, page=page, **kwargs)
+    return render_template(
+        '/demos/forum/template.html', title=page_title,
+        page=page, content=content,  **kwargs)
 
 @app.before_request
 def before_request():
@@ -128,7 +138,9 @@ def demos_forum_signup():
 @forum_require_auth
 def demos_forum():
     if request.method == 'GET':
-        return render_template('/demos/forum/home.html', username=session['username'])
+        posts = forum_db.post_gather(20)
+        print(posts)
+        return render_forum_template('/demos/forum/home.html', username=session['username'], posts=posts)
     elif request.method == 'POST':
         return 'ok'
     else:
@@ -138,7 +150,7 @@ def demos_forum():
 @forum_require_auth
 def demos_forum_post(pkey):
     if request.method == 'GET':
-        return render_template('/demos/forum/post.html', username=session['username'])
+        return render_forum_template('/demos/forum/post.html', username=session['username'])
     elif request.method == 'POST':
         return 'ok'
     else:
@@ -148,7 +160,7 @@ def demos_forum_post(pkey):
 @forum_require_auth
 def demos_forum_user(username):
     if request.method == 'GET':
-        return render_template('/demos/forum/user.html', username=session['username'])
+        return render_forum_template('/demos/forum/user.html', username=session['username'])
     else:
         abort(405)
 
