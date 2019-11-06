@@ -71,7 +71,23 @@ def demos_stocks():
 # SITE SECTION: Live forum demo
 @app.route('/demos/forum')
 def demos_forum():
-    return ''
+    return 'forum homepage'
+
+@app.route('/demos/forum/login')
+def demos_forum_login():
+    return 'forum login'
+
+@app.route('/demos/forum/signup')
+def demos_forum_signup():
+    return 'forum signup'
+
+@app.route('/demos/forum/post/<pkey>')
+def demos_forum_post(pkey):
+    return pkey
+
+@app.route('/demos/forum/user/<username>')
+def demos_forum_user(username):
+    return username
 
 # Launch the application
 app.run(
