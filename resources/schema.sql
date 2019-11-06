@@ -5,7 +5,7 @@ CREATE TABLE users (
 );
 
 CREATE TABLE posts (
-    post_pkey       PRIMARY KEY,
+    post_pkey       TEXT NOT NULL UNIQUE,
     create_date     INTEGER NOT NULL,
     username        TEXT NOT NULL,
     title           TEXT NOT NULL,
@@ -13,3 +13,9 @@ CREATE TABLE posts (
     likes           INTEGER DEFAULT 0,
     image           TEXT
 );
+
+CREATE TABLE comments (
+    username        TEXT NOT NULL,
+    create_date     INTEGER NOT NULL,
+    content         TEXT
+)

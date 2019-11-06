@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+        <link rel="shortcut icon" href="/static/img/favicon-stocks.ico">
+
+        <link rel="stylesheet" href="/static/css/floating-button.css">
+
+        <title>William Gardner | Stock Checker</title>
+    </head>
+
+    <style>
+        body {
+            margin-top: 10px;
+        }
+
+        .uppercase {
+            text-transform: uppercase
+        }
+
+        ::-webkit-input-placeholder {
+            text-transform: initial;
+        }
+
+        ::-moz-placeholder { 
+            text-transform: initial;
+        }
+
+        .red {
+            color: red;
+        }
+
+        .green {
+            color: green;
+        }
+
+        #code {
+            font-weight: bold;
+        }
+
+        #price:before {
+            content: '$';
+        }
+
+        #change:after {
+            content: '%';
+        }
+    </style>
+
+    <body>
+        <div class="container">
+            <h1>Live Stock Checker</h1>
+            <p class="lead">
+                Get the latest stock price information live from
+                <a target="__blank" href="https://www.marketwatch.com/">marketwatch</a>
+            </p>
+
+            <hr/>
+
+            <div class="input-group">
+                <input id="input" type="text" class="form-control form-control-lg uppercase" placeholder="Company code...">
+                <div class="input-group-append">
+                    <button id="search" class="btn btn-success btn-lg">Search</button>
+                </div>
+            </div>
+
+            <br/>
+
+            <div id="error" class="alert alert-danger" role="alert" hidden>
+                An error occurred
+            </div>
+                  
+
+            <div id="jumbo" class="jumbotron shadow" hidden>
+                <h1 id="code">GOOGL</h1>
+
+                <hr>
+
+                <span id="price" class="h2 mr-1"></span>
+                <span id="change"></span>
+
+                <div id="loader">
+                    <div class="spinner-border text-secondary" role="status"></div>
+                    <span>Loading...</span>
+                </div>
+
+
+                <br/><br/>
+
+                <button id="refresh" class="btn btn-primary btn-lg">Refresh</button>
+            </div>
+
+            <a class="btn btn-info btn-return" role="button" href="/site/portfolio">
+                <i class="icon-angle-left pr-1"></i>
+                return to portfolio
+            </a>
+        </div>
+
+        <script src="/static/js/popper.min.js"></script>
+        <script src="/static/js/jquery-3.4.1.min.js"></script>
+        <script src="/static/js/bootstrap.min.js"></script>
+
+        <script>
+            var previous = null
+
+            function submit_stock(code) {
+                if (!code) code = $('#input').val().toUpperCase()
+                previous = code
+
+                $('#code').text(code)
+                $('#jumbo').attr('hidden', false)
+                $('#error').attr('hidden', true)
+
+                $('#price').hide()
+                $('#change').hide()
+                $('#loader').show()
+
+                $.post('/demos/stocks', {code: code}, (resp) => {
+                    console.log(resp)
+
+                    if (resp.change > 0) {
+                        $('#change').removeClass('red')
+                        $('#change').addClass('green')
+                    } else {
+                        $('#change').removeClass('green')
+                        $('#change').addClass('red')
+                    }
+
+                    $('#price').text(resp.price)
+                    $('#change').text(resp.change)
+
+                    $('#price').show()
+                    $('#change').show()
+                    $('#loader').hide()
+
+                    $('#jumbo').show()
+                }, 'json').fail(() => {
+                    $('#jumbo').attr('hidden', true)
+                    $('#error').attr('hidden', false)
+                })
+            }
+
+            $('#search').click(submit_stock)
+            $('#refresh').click(() => submit_stock(previous))
+            $('#input').keypress((e) => {
+                if (e.which == 13) submit_stock()
+            })
+        </script>
+    </body>
+</html>
