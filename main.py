@@ -69,25 +69,88 @@ def demos_stocks():
         abort(405)
 
 # SITE SECTION: Live forum demo
-@app.route('/demos/forum')
-def demos_forum():
-    return 'forum homepage'
+def forum_require_auth(func):
+    def wrapper(*args, **kwargs):
+        if session['logged_in']:
+            return func(*args, **kwargs)
+        else:
+            return redirect('/demos/forum/login')
+    wrapper.__name__ = func.__name__
+    return wrapper
 
-@app.route('/demos/forum/login')
+@app.before_request
+def before_request():
+    if 'logged_in' not in session:
+        session['logged_in'] = False
+        session['username'] = None
+
+@app.route('/demos/forum/login', methods=['GET', 'POST'])
 def demos_forum_login():
-    return 'forum login'
+    if request.method == 'GET':
+        return render_template('/demos/forum/login.html')
+    elif request.method == 'POST':
+        username = request.values.get('username')
+        password = request.values.get('password')
 
-@app.route('/demos/forum/signup')
+        if forum_db.user_validate(username, password):
+            session['logged_in'] = True
+            session['username'] = username
+            return redirect('/demos/forum')
+        else:
+            return redirect('/demos/forum/login?msg=1')
+    else:
+        abort(405)
+
+@app.route('/demos/forum/logout', methods=['GET'])
+def demos_forum_logout():
+    session['logged_in'] = False
+    session['username'] = None
+    return redirect('/demos/forum/login')
+
+@app.route('/demos/forum/signup', methods=['GET', 'POST'])
 def demos_forum_signup():
-    return 'forum signup'
+    if request.method == 'GET':
+        return render_template('/demos/forum/signup.html')
+    elif request.method == 'POST':
+        username = request.values.get('username')
+        password = request.values.get('password')
+        password2 = request.values.get('password2')
 
-@app.route('/demos/forum/post/<pkey>')
+        if password != password2: return redirect('/demos/forum/signup?msg=2')
+        if forum_db.user_exists(username): return redirect('/demos/forum/signup?msg=1')
+
+        forum_db.user_add(username, password)
+        return redirect('/demos/forum/login?msg=3')
+    else:
+        abort(405)
+
+@app.route('/demos/forum', methods=['GET', 'POST'])
+@forum_require_auth
+def demos_forum():
+    if request.method == 'GET':
+        return render_template('/demos/forum/home.html', username=session['username'])
+    elif request.method == 'POST':
+        return 'ok'
+    else:
+        abort(405)
+
+@app.route('/demos/forum/post/<pkey>', methods=['GET', 'POST'])
+@forum_require_auth
 def demos_forum_post(pkey):
-    return pkey
+    if request.method == 'GET':
+        return render_template('/demos/forum/post.html', username=session['username'])
+    elif request.method == 'POST':
+        return 'ok'
+    else:
+        abort(405)
 
-@app.route('/demos/forum/user/<username>')
+@app.route('/demos/forum/user/<username>', methods=['GET'])
+@forum_require_auth
 def demos_forum_user(username):
-    return username
+    if request.method == 'GET':
+        return render_template('/demos/forum/user.html', username=session['username'])
+    else:
+        abort(405)
 
 # Launch the application
 app.run(

@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+
+        <title>William Gardner | Demo Forum Signup</title>
+    </head>
+
+    <style>
+        body {
+            display: -ms-flexbox;
+            display: -webkit-box;
+            display: flex;
+            -ms-flex-align: center;
+            -ms-flex-pack: center;
+            -webkit-box-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            justify-content: center;
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: #f5f5f5;
+        }
+
+        #signin {
+            width: 100%;
+            max-width: 330px;
+            padding: 15px;
+            margin: 0 auto;
+        }
+    </style>
+
+    <body class="text-center">
+        <form method="POST">
+            <h1 class="h3 mb-3 font-weight-normal">Forum Signup</h1>
+
+            <div id="used" class="alert alert-danger" role="alert" hidden>Username already in use</div>
+            <div id="mismatch" class="alert alert-warning" role="alert" hidden>Passwords do not match</div>
+
+            <input class="form-control mb-1" placeholder="Username" name="username" required>
+            <input class="form-control mb-1" placeholder="Password" name="password" type="password" required>
+            <input class="form-control" placeholder="Repeat password" name="password2" type="password" required>
+
+            <br/>
+
+            <button class="btn btn-md btn-primary btn-block" type="submit">Sign up</button>
+        </form>
+
+        <script src="/static/js/jquery-3.4.1.min.js"></script>
+        <script src="/static/js/bootstrap.min.js"></script>
+
+        <script>
+            var params = new URLSearchParams(window.location.search)
+            if (params.get('msg') == 1)
+                $('#used').attr('hidden', false)
+            if (params.get('msg') == 2)
+                $('#mismatch').attr('hidden', false)
+        </script>
+    </body>
+</html>

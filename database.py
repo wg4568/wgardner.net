@@ -95,7 +95,7 @@ class Forum:
 
     @with_database
     def user_exists(self, cur, username):
-        query = 'SELECT COUNT(*) WHERE username=?'
+        query = 'SELECT COUNT(*) FROM users WHERE username=?'
         resp = cur.execute(query, (username,))
         return bool(resp.fetchone()[0])
     

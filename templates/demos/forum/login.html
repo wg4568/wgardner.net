@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <link rel="stylesheet" href="/static/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/static/css/font-awesome.min.css">
+
+        <title>William Gardner | Demo Forum Login</title>
+    </head>
+
+    <style>
+        body {
+            display: -ms-flexbox;
+            display: -webkit-box;
+            display: flex;
+            -ms-flex-align: center;
+            -ms-flex-pack: center;
+            -webkit-box-align: center;
+            align-items: center;
+            -webkit-box-pack: center;
+            justify-content: center;
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: #f5f5f5;
+        }
+
+        #signin {
+            width: 100%;
+            max-width: 330px;
+            padding: 15px;
+            margin: 0 auto;
+        }
+    </style>
+
+    <body class="text-center">
+        <form method="POST">
+            <h1 class="h3 mb-3 font-weight-normal">Forum Login</h1>
+
+            <div id="error" class="alert alert-danger" role="alert" hidden>Invalid login</div>
+            <div id="timeout" class="alert alert-warning" role="alert" hidden>Session timed out</div>
+            <div id="created" class="alert alert-success" role="alert" hidden>Account created</div>
+
+            <input class="form-control mb-1" placeholder="Username" name="username" required autofocus>
+            <input class="form-control" placeholder="Password" name="password" type="password" required>
+
+            <br/>
+
+            <button class="btn btn-md btn-primary btn-block" type="submit">Sign in</button>
+            
+            <br/>
+
+            <p>Need an account? <a href="/demos/forum/signup">sign up</a></p>
+        </form>
+
+        <script src="/static/js/jquery-3.4.1.min.js"></script>
+        <script src="/static/js/bootstrap.min.js"></script>
+
+        <script>
+            var params = new URLSearchParams(window.location.search)
+            if (params.get('msg') == 1)
+                $('#error').attr('hidden', false)
+            if (params.get('msg') == 2)
+                $('#timeout').attr('hidden', false)
+            if (params.get('msg') == 3)
+                $('#created').attr('hidden', false)
+        </script>
+    </body>
+</html>
