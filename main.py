@@ -16,8 +16,8 @@ def render_site_template(template, **kwargs):
 
 # Initialize globals
 app = Flask(__name__)
+forum_db = database.Forum('resources/forum.db', schema='resources/schema.sql')
 pages = [ a.split('.')[0] for a in os.listdir('templates/site/') ]
-db = database.Database('database.db', schema='resources/schema.sql')
 
 # Load configuration from file
 with open('resources/config.json') as f:
