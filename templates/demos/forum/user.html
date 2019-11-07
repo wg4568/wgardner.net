@@ -1,0 +1,101 @@
+<style>
+    .liked {
+        color: red;
+    }
+
+    .disable-select {
+        user-select: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+    }
+</style>
+
+<span class="h5">User Info</span>
+<a id="back" role="button" class="btn btn-sm btn-secondary ml-2" href="/demos/forum">Go Back</a>
+<br/><br/>
+
+<table class="table table-bordered" style="width:30rem;">
+    <tbody>
+        <tr>
+            <th scope="row">Username</th>
+            <td>{{ user.username }}</td>
+        </tr>
+        <tr>
+            <th scope="row">Posts</th>
+            <td>{{ stats['posts'] }}</td>
+        </tr>
+        <tr>
+            <th scope="row">Comments</th>
+            <td>{{ stats['comments'] }}</td>
+        </tr>
+        <tr>
+            <th scope="row">Total Likes</th>
+            <td>{{ stats['likes'] }}</td>
+        </tr>
+    </tbody>
+</table>
+
+
+<span class="h5">Posting History</span>
+<br/><br/>
+
+<div class="card-columns" style="width: 60rem;">
+    {% for post in posts %}
+    <div class="card" style="width: 18rem; margin-bottom: 2rem;">
+        {% if post.image %}
+            <img class="card-img-top" width="100%" src="{{ post.image }}">
+        {% endif %}
+        <div class="card-body">
+            <a href="/demos/forum/post/{{ post.pkey }}?back=/demos/forum/user/{{ username }}" class="h5 card-title">{{ post.title }}</a>
+            <p class="card-text">{{ post.content }}</p>
+
+            <h6 class="card-subtitle mt-1 mb-2 text-muted disable-select row">
+                <div class="col-md-3" onclick="like_post('{{ post.pkey }}')">
+                    <i class="icon-heart {% if post.pkey in active_user.liked_posts %}liked{% endif %}" id="heart-{{ post.pkey }}"></i>
+                    <span id="likes-{{ post.pkey }}" class="{% if post.pkey in active_user.liked_posts %}liked{% endif %}">{{ post.likes }}</span>
+                </div>
+                
+                <div class="col-md-9">
+                    <i class="icon-comment"></i>
+                    <span>{{ post.comments | length }}</span>
+                </div>
+            </h6>
+
+        </div>
+        
+        <div class="card-footer text-muted">
+            <a href="/demos/forum/user/{{ post.username }}">{{ post.username }}</a>
+            @ {{ post.date }} {{ post.time }}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    function like_post(pkey) {
+        var likes = parseInt($(`#likes-${pkey}`).text())
+
+        if ($(`#heart-${pkey}`).hasClass('liked')) {
+            $(`#heart-${pkey}`).removeClass('liked')
+            $(`#likes-${pkey}`).removeClass('liked')
+
+            $(`#likes-${pkey}`).text(likes - 1)
+
+            $.post(`/demos/forum/post/${pkey}/unlike`)
+        } else {
+            $(`#heart-${pkey}`).addClass('liked')
+            $(`#likes-${pkey}`).addClass('liked')
+
+            $(`#likes-${pkey}`).text(likes + 1)
+
+            $.post(`/demos/forum/post/${pkey}/like`)
+        }
+    }
+
+    window.onload = () => {
+        $('#new').click(() => $('#new-form').attr('hidden', false))
+        $('#cancel').click(() => $('#new-form').attr('hidden', true))
+    }
+</script>

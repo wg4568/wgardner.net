@@ -199,9 +199,14 @@ def demos_forum_post_unlike(pkey):
 @forum_require_auth
 def demos_forum_user(username):
     if request.method == 'GET':
+        posts = forum_db.user_posts(username)
+        user = forum_db.user_fetch(username)
         return render_forum_template(
             '/demos/forum/user.html',
-            username=session['forum_username']
+            username=session['forum_username'],
+            active_user=forum_db.user_fetch(session['username']),
+            stats=forum_db.user_stats(username),
+            user=user, posts=posts
         )
     else:
         abort(405)

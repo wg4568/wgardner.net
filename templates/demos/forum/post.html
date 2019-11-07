@@ -13,7 +13,7 @@
 </style>
 
 <span class="h5">Viewing Post</span>
-<a role="button" class="btn btn-sm btn-secondary ml-2" href="/demos/forum">Go Back</a>
+<a id="back" role="button" class="btn btn-sm btn-secondary ml-2" href="/demos/forum">Go Back</a>
 <br/><br/>
 
 <div style="width: 36rem">
@@ -31,7 +31,7 @@
 		</div>
 		
 		<div class="card-footer text-muted">
-			<a href="/demos/forum/user/{{ post.username }}">{{ post.username }}</a>
+			<a href="/demos/forum/user/{{ post.username }}?back=/demos/forum/post/{{ post.pkey }}">{{ post.username }}</a>
 			@ {{ post.date }} {{ post.time }}
 		</div>
 	</div>
@@ -49,7 +49,7 @@
 		{% for comment in comments %}
 			<div class="list-group-item align-items-start">
 				<div class="d-flex w-100 justify-content-between">
-					<a href="/demos/forum/user/{{ comment.username }}" class="h6 mb-1">{{ comment.username }}</a>
+					<a href="/demos/forum/user/{{ comment.username }}?back=/demos/forum/post/{{ post.pkey }}" class="h6 mb-1">{{ comment.username }}</a>
 					<small>{{ comment.date }} {{ comment.time }}</small>
 				</div>
 
@@ -64,6 +64,7 @@
 <script>
     function like_post(pkey) {
 		var likes = parseInt($(`#likes-${pkey}`).text())
+		var params = new URLSearchParams(window.location.search)
 
 		if ($(`#heart-${pkey}`).hasClass('liked')) {
 			$(`#heart-${pkey}`).removeClass('liked')

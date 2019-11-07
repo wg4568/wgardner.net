@@ -57,6 +57,9 @@
 
         <script>
             var params = new URLSearchParams(window.location.search)
+
+            if (params.has('back'))
+                $('#back').attr('href', params.get('back'))
         </script>
     </body>
 </html>

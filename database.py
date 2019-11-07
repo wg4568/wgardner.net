@@ -109,6 +109,35 @@ class Forum:
         resp = cur.execute(query, (username,))
         return bool(resp.fetchone()[0])
     
+    @with_database
+    def user_posts(self, cur, username, comments=True, limit=100):
+        query = 'SELECT * FROM posts WHERE username=? ORDER BY create_date DESC LIMIT ?'
+        resp = cur.execute(query, (username, limit))
+        posts = []
+        for post in resp.fetchall():
+            _comments = None
+            if comments:
+                _comments = self.comment_fetch(post[0], limit=limit)
+            posts.append(Forum.Post(post, comments=_comments))
+        return posts
+    
+    @with_database
+    def user_stats(self, cur, username):
+        query = 'SELECT COUNT(*) FROM posts WHERE username=?'
+        posts = cur.execute(query, (username,)).fetchone()[0]
+
+        query = 'SELECT SUM(likes) FROM posts WHERE username=?'
+        likes = cur.execute(query, (username,)).fetchone()[0]
+
+        query = 'SELECT COUNT(*) FROM comments WHERE username=?'
+        comments = cur.execute(query, (username,)).fetchone()[0]
+
+        return {
+            'posts': posts,
+            'likes': likes,
+            'comments': comments
+        }
+
     # OPERATIONS: posts
     @with_database
     def post_add(self, cur, username, title, content, image=None, likes=0):
@@ -200,9 +229,3 @@ class Forum:
         query = 'SELECT * FROM comments WHERE post_pkey=? ORDER BY create_date DESC LIMIT ?'
         resp = cur.execute(query, (post_pkey, limit))
         return [ Forum.Comment(a) for a in resp.fetchall() ]
-
-# forum_db = Forum('resources/forum.db', schema='resources/schema.sql')
-# forum_db.post_add('william', 'no photo this time', 'no photo this time, only words!!! ahahahahah some words that I wrote are neat, right?', image='https://cdn.photographylife.com/wp-content/uploads/2016/06/Brown-Anole.jpg')
-
-# forum_db.post_like('william', 'WIL19110613')
-# print(forum_db.post_fetch('WIL19110613'))
