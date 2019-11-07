@@ -73,7 +73,7 @@ def demos_stocks():
 # SITE SECTION: Live forum demo
 def forum_require_auth(func):
     def wrapper(*args, **kwargs):
-        if session['logged_in']:
+        if session['forum_logged_in']:
             return func(*args, **kwargs)
         else:
             return redirect('/demos/forum/login')
@@ -95,8 +95,8 @@ def render_forum_template(template, **kwargs):
 @app.before_request
 def before_request():
     if 'logged_in' not in session:
-        session['logged_in'] = False
-        session['username'] = None
+        session['forum_logged_in'] = False
+        session['forum_username'] = None
 
 @app.route('/demos/forum/login', methods=['GET', 'POST'])
 def demos_forum_login():
@@ -107,8 +107,8 @@ def demos_forum_login():
         password = request.values.get('password')
 
         if forum_db.user_validate(username, password):
-            session['logged_in'] = True
-            session['username'] = username
+            session['forum_logged_in'] = True
+            session['forum_username'] = username
             return redirect('/demos/forum')
         else:
             return redirect('/demos/forum/login?msg=1')
@@ -117,8 +117,8 @@ def demos_forum_login():
 
 @app.route('/demos/forum/logout', methods=['GET'])
 def demos_forum_logout():
-    session['logged_in'] = False
-    session['username'] = None
+    session['forum_logged_in'] = False
+    session['forum_username'] = None
     return redirect('/demos/forum/login')
 
 @app.route('/demos/forum/signup', methods=['GET', 'POST'])
@@ -143,15 +143,15 @@ def demos_forum_signup():
 def demos_forum():
     if request.method == 'GET':
         posts = forum_db.post_gather(config['demos']['forum']['max_posts'])
-        user = forum_db.user_fetch(session['username'])
+        user = forum_db.user_fetch(session['forum_username'])
         return render_forum_template(
             '/demos/forum/home.html',
-            username=session['username'],
+            username=session['forum_username'],
             posts=posts,
             user=user
         )
     elif request.method == 'POST':
-        username = session['username']
+        username = session['forum_username']
         title = request.values.get('title')
         content = request.values.get('content')
         image = request.values.get('image')
@@ -167,10 +167,10 @@ def demos_forum():
 def demos_forum_post(pkey):
     if request.method == 'GET':
         post = forum_db.post_fetch(pkey)
-        user = forum_db.user_fetch(session['username'])
+        user = forum_db.user_fetch(session['forum_username'])
         return render_forum_template(
             '/demos/forum/post.html',
-            username=session['username'],
+            username=session['forum_username'],
             post=post,
             user=user
         )
@@ -182,13 +182,13 @@ def demos_forum_post(pkey):
 @app.route('/demos/forum/post/<pkey>/like', methods=['POST'])
 @forum_require_auth
 def demos_forum_post_like(pkey):
-    forum_db.post_like(session['username'], pkey)
+    forum_db.post_like(session['forum_username'], pkey)
     return 'ok'
 
 @app.route('/demos/forum/post/<pkey>/unlike', methods=['POST'])
 @forum_require_auth
 def demos_forum_post_unlike(pkey):
-    forum_db.post_unlike(session['username'], pkey)
+    forum_db.post_unlike(session['forum_username'], pkey)
     return 'ok'
 
 @app.route('/demos/forum/user/<username>', methods=['GET'])
@@ -197,7 +197,7 @@ def demos_forum_user(username):
     if request.method == 'GET':
         return render_forum_template(
             '/demos/forum/user.html',
-            username=session['username']
+            username=session['forum_username']
         )
     else:
         abort(405)
