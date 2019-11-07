@@ -9,61 +9,57 @@
         
         <title>William Gardner | {{ title }}</title>
     </head>
-
+    
     <style>
-        html, body {
-            height: 100%;
-        }
-
-        .background {
-            margin-bottom: -9999px;
-            padding-bottom: 9999px;
-            width: 100%;
-        }
-
-        .selected {
-            color: red;
-        }
-
-        .selected:hover {
-            color: red;
+        body {
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
         }
         
-        .container {
-            min-height: 100%;
-            overflow: hidden;
+        .header {
+            padding-bottom: 1rem;
+            border-bottom: .05rem solid #e5e5e5;          
         }
+
+        .content {
+            padding-top: 1rem;
+        }
+
+        /* Customize container */
+        @media (min-width: 48em) {
+            .container {
+                max-width: 46rem;
+            }
+        }
+  
     </style>
 
     <body>
-        <div class="container background shadow">
-            <nav class="navbar navbar-expand-lg mx-0 pb-0">
-                <span class="navbar-brand">William Gardner</span>
-
-                <div class="collapse navbar-collapse">
-                    <ul class="navbar-nav">
+        <div class="container">
+            <div class="header clearfix">
+                <nav>
+                    <ul class="nav nav-pills float-right">
                         <li class="nav-item">
-                            <a class="nav-link {%if page=='about'%}selected{%endif%}" href="/site/about"><i class="mr-1 icon-home"></i>About</a>
+                            <a class="nav-link {%if page=='home'%}active{%endif%}" href="/site/home">Home</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link {%if page=='services'%}selected{%endif%}" href="/site/services"><i class="mr-1 icon-book"></i>Services</a>
-                        </li>
-            
-                        <li class="nav-item">
-                            <a class="nav-link {%if page=='portfolio'%}selected{%endif%}" href="/site/portfolio"><i class="mr-1 icon-folder-open"></i>Portfolio</a>
+                            <a class="nav-link {%if page=='services'%}active{%endif%}" href="/site/services">Services</a>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link {%if page=='contact'%}selected{%endif%}" href="/site/contact"><i class="mr-1 icon-envelope"></i>Contact</a>
+                            <a class="nav-link {%if page=='portfolio'%}active{%endif%}" href="/site/portfolio">Portfolio</a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a class="nav-link {%if page=='contact'%}active{%endif%}" href="/site/contact">Contact</a>
                         </li>
                     </ul>
-                </div>
-            </nav>
+                </nav>
+                <h3 class="text-muted">William Gardner</h3>
+            </div>
 
-            <hr/>
-
-            <div class="mx-5" style="width: 90%;">
+            <div class="content">
                 {{ content | safe }}
             </div>
         </div>
