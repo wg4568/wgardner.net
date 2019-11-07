@@ -1,3 +1,4 @@
+from datetime import datetime as dt
 from werkzeug import security
 import sqlite3
 import time
@@ -18,16 +19,20 @@ class Forum:
         def __init__(self, raw):
             self._raw = raw
             self.pkey = raw[0]
-            self.created = raw[1]
+            self.created = int(raw[1])
             self.username = raw[2]
             self.title = raw[3]
             self.content = raw[4]
-            self.likes = raw[5]
+            self.likes = int(raw[5])
             self.deleted = bool(raw[6])
             self.image = raw[7]
-        
+
+            self._timestamp = dt.utcfromtimestamp(self.created)
+            self.date = self._timestamp.strftime('%m/%d/%y')
+            self.time = self._timestamp.strftime('%I:%M%p').lower()
+ 
         def __repr__(self):
-            return 'Post(%s, %s, \'%s\')' % (self.pkey, self.username, self.title)
+            return 'Post(%s, %s, \'%s\', %s likes)' % (self.pkey, self.username, self.title, self.likes)
     
     class User:
         def __init__(self, raw):
@@ -50,9 +55,13 @@ class Forum:
             self._raw = raw
             self.post_pkey = raw[0]
             self.username = raw[1]
-            self.create_date = raw[2]
+            self.created = int(raw[2])
             self.content = raw[3]
-        
+ 
+            self._timestamp = dt.utcfromtimestamp(self.created)
+            self.date = self._timestamp.strftime('%m/%d/%y')
+            self.time = self._timestamp.strftime('%I:%M%p').lower()
+   
         def __repr__(self):
             return 'Comment(%s, \'%s\', %s)' % (self.username, self.content, self.post_pkey)
 
@@ -116,6 +125,8 @@ class Forum:
             username, title, content,
             likes, False, image
         ))
+
+        return post_pkey
     
     @with_database
     def post_fetch(self, cur, post_pkey):
@@ -149,7 +160,23 @@ class Forum:
         cur.execute(query, (post_pkey,))
 
         return True
-    
+
+    @with_database
+    def post_unlike(self, cur, username, post_pkey):
+        liked_posts = self.user_fetch(username).liked_posts
+
+        if not post_pkey in liked_posts: return False
+        else: liked_posts = ','.join([a for a in liked_posts if a != post_pkey])
+
+        query = 'UPDATE users SET liked_posts=? WHERE username=?'
+        cur.execute(query, (liked_posts, username))
+
+        query = 'UPDATE posts SET likes=likes-1 WHERE post_pkey=?'
+        cur.execute(query, (post_pkey,))
+
+        return True
+
+
     # OPERATIONS: comments
     @with_database
     def comment_add(self, cur, post_pkey, username, content):
@@ -162,3 +189,9 @@ class Forum:
         query = 'SELECT * FROM comments WHERE post_pkey=? ORDER BY create_date DESC LIMIT ?'
         resp = cur.execute(query, (post_pkey, limit))
         return [ Forum.Comment(a) for a in resp.fetchall() ]
+
+# forum_db = Forum('resources/forum.db', schema='resources/schema.sql')
+# forum_db.post_add('william', 'no photo this time', 'no photo this time, only words!!! ahahahahah some words that I wrote are neat, right?', image='https://cdn.photographylife.com/wp-content/uploads/2016/06/Brown-Anole.jpg')
+
+# forum_db.post_like('william', 'WIL19110613')
+# print(forum_db.post_fetch('WIL19110613'))

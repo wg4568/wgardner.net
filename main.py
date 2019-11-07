@@ -85,8 +85,12 @@ def render_forum_template(template, **kwargs):
     page_title = page.capitalize()
     content = render_template(template, page=page, **kwargs)
     return render_template(
-        '/demos/forum/template.html', title=page_title,
-        page=page, content=content,  **kwargs)
+        '/demos/forum/template.html',
+        title=page_title,
+        page=page,
+        content=content,
+        **kwargs
+    )
 
 @app.before_request
 def before_request():
@@ -138,11 +142,23 @@ def demos_forum_signup():
 @forum_require_auth
 def demos_forum():
     if request.method == 'GET':
-        posts = forum_db.post_gather(20)
-        print(posts)
-        return render_forum_template('/demos/forum/home.html', username=session['username'], posts=posts)
+        posts = forum_db.post_gather(config['demos']['forum']['max_posts'])
+        user = forum_db.user_fetch(session['username'])
+        return render_forum_template(
+            '/demos/forum/home.html',
+            username=session['username'],
+            posts=posts,
+            user=user
+        )
     elif request.method == 'POST':
-        return 'ok'
+        username = session['username']
+        title = request.values.get('title')
+        content = request.values.get('content')
+        image = request.values.get('image')
+        if not image: image = None
+
+        pkey = forum_db.post_add(username, title, content, image=image)
+        return redirect('/demos/forum/post/' + pkey)
     else:
         abort(405)
 
@@ -150,17 +166,39 @@ def demos_forum():
 @forum_require_auth
 def demos_forum_post(pkey):
     if request.method == 'GET':
-        return render_forum_template('/demos/forum/post.html', username=session['username'])
+        post = forum_db.post_fetch(pkey)
+        user = forum_db.user_fetch(session['username'])
+        return render_forum_template(
+            '/demos/forum/post.html',
+            username=session['username'],
+            post=post,
+            user=user
+        )
     elif request.method == 'POST':
         return 'ok'
     else:
         abort(405)
 
+@app.route('/demos/forum/post/<pkey>/like', methods=['POST'])
+@forum_require_auth
+def demos_forum_post_like(pkey):
+    forum_db.post_like(session['username'], pkey)
+    return 'ok'
+
+@app.route('/demos/forum/post/<pkey>/unlike', methods=['POST'])
+@forum_require_auth
+def demos_forum_post_unlike(pkey):
+    forum_db.post_unlike(session['username'], pkey)
+    return 'ok'
+
 @app.route('/demos/forum/user/<username>', methods=['GET'])
 @forum_require_auth
 def demos_forum_user(username):
     if request.method == 'GET':
-        return render_forum_template('/demos/forum/user.html', username=session['username'])
+        return render_forum_template(
+            '/demos/forum/user.html',
+            username=session['username']
+        )
     else:
         abort(405)
 

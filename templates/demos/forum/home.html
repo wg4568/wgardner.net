@@ -1,28 +1,46 @@
-<form class="card" method="POST" hidden>
+<style>
+    .liked {
+        color: red;
+    }
+
+    .disable-select {
+        user-select: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+    }
+</style>
+
+<span class="h5">Recent Posts</span>
+<button id="new" class="btn btn-sm btn-primary ml-2">New Post</button>
+<br/><br/>
+
+<form id="new-form" class="card mb-3" method="POST" hidden>
     <h5 class="card-header">New Post</h5>
 
     <div class="card-body">
         <div class="form-group row">
-            <label class="col-md-2 col-form-label col-form-label-md">Post Title</label>
+            <label class="col-md-2 col-form-label">Post Title</label>
     
             <div class="col-md-10">
-                <input class="form-control form-control-md" placeholder="Title..." required>
+                <input class="form-control" name="title" placeholder="Title..." required>
             </div>
         </div>
     
         <div class="form-group row">
-            <label class="col-md-2 col-form-label col-form-label-md">Post Body</label>
+            <label class="col-md-2 col-form-label">Post Body</label>
     
             <div class="col-md-10">
-                <textarea class="form-control form-control-md" placeholder="Content..." required></textarea>
+                <textarea class="form-control" name="content" placeholder="Content..." required></textarea>
             </div>
         </div>
     
         <div class="form-group row">
-            <label class="col-md-2 col-form-label col-form-label-md">Image URL</label>
+            <label class="col-md-2 col-form-label">Image URL</label>
     
             <div class="col-md-10">
-                <input type="url" class="form-control form-control-md" placeholder="Image...">
+                <input type="url" class="form-control" name="image" placeholder="Image...">
             </div>
         </div>            
 
@@ -30,23 +48,58 @@
             <div class="col-md-2"></div>
             <div class="col-sm-10">
                 <button type="submit" class="btn btn-primary">Post</button>
-                <button class="btn btn-outline-danger">Cancel</button>
+                <button id="cancel" class="btn btn-outline-danger">Cancel</button>
             </div>
         </div>
     </div>
 </form>
-
-<span class="h5">Recent Posts</span>
-<button class="btn btn-sm btn-outline-primary ml-2">New Post</button>
-<br/><br/>
-
-{% for post in posts %}
-<div class="card" style="width: 18rem;">
-    <img class="card-img-top" width="100%" src="https://cdn.photographylife.com/wp-content/uploads/2016/06/Brown-Anole.jpg">
-    <div class="card-body">
-        <a href="/demos/forum/post/pkey" class="h5 card-title">Post Title</a>
-        <h6 class="card-subtitle mt-1 mb-2 text-muted">username</h6>
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+    
+<div class="card-columns" style="width: 60rem;">
+    {% for post in posts %}
+    <div class="card" style="width: 18rem; margin-bottom: 2rem;">
+        {% if post.image %}
+            <img class="card-img-top" width="100%" src="{{ post.image }}">
+        {% endif %}
+        <div class="card-body">
+            <a href="/demos/forum/post/{{ post.pkey }}" class="h5 card-title">{{ post.title }}</a>
+            <h6 class="card-subtitle mt-1 mb-2 text-muted disable-select" onclick="like_post('{{ post.pkey }}')">
+                <i class="icon-heart {% if post.pkey in user.liked_posts %}liked{% endif %}" id="heart-{{ post.pkey }}"></i>
+                <span id="likes-{{ post.pkey }}" class="{% if post.pkey in user.liked_posts %}liked{% endif %}">{{ post.likes }}</span>
+            </h6>
+            <p class="card-text">{{ post.content }}</p>
+        </div>
+        
+        <div class="card-footer text-muted">
+            <a href="/demos/forum/user/{{ post.username }}">{{ post.username }}</a>
+            @ {{ post.date }} {{ post.time }}
+        </div>
     </div>
+    {% endfor %}
 </div>
-{% endfor %}
+
+<script>
+    function like_post(pkey) {
+        var likes = parseInt($(`#likes-${pkey}`).text())
+
+        if ($(`#heart-${pkey}`).hasClass('liked')) {
+            $(`#heart-${pkey}`).removeClass('liked')
+            $(`#likes-${pkey}`).removeClass('liked')
+
+            $(`#likes-${pkey}`).text(likes - 1)
+
+            $.post(`/demos/forum/post/${pkey}/unlike`)
+        } else {
+            $(`#heart-${pkey}`).addClass('liked')
+            $(`#likes-${pkey}`).addClass('liked')
+
+            $(`#likes-${pkey}`).text(likes + 1)
+
+            $.post(`/demos/forum/post/${pkey}/like`)
+        }
+    }
+
+    window.onload = () => {
+        $('#new').click(() => $('#new-form').attr('hidden', false))
+        $('#cancel').click(() => $('#new-form').attr('hidden', true))
+    }
+</script>
