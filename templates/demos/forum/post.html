@@ -23,11 +23,11 @@
 		{% endif %}
 		<div class="card-body">
 			<a href="/demos/forum/post/{{ post.pkey }}" class="h5 card-title">{{ post.title }}</a>
+			<p class="card-text">{{ post.content }}</p>
 			<h6 class="card-subtitle mt-1 mb-2 text-muted disable-select" onclick="like_post('{{ post.pkey }}')">
 				<i class="icon-heart {% if post.pkey in user.liked_posts %}liked{% endif %}" id="heart-{{ post.pkey }}"></i>
 				<span id="likes-{{ post.pkey }}" class="{% if post.pkey in user.liked_posts %}liked{% endif %}">{{ post.likes }}</span>
 			</h6>
-			<p class="card-text">{{ post.content }}</p>
 		</div>
 		
 		<div class="card-footer text-muted">
@@ -35,15 +35,30 @@
 			@ {{ post.date }} {{ post.time }}
 		</div>
 	</div>
-		
+
 	<form class="mt-4" method="POST">
 		<div class="input-group">
-			<input type="text" class="form-control" placeholder="Comment...">
+			<input type="text" class="form-control" name="comment" placeholder="Comment...">
 			<div class="input-group-append">
 				<button class="btn btn-primary" type="button">Comment</button>
 			</div>
 		</div>
 	</form>
+
+	<div class="list-group mt-3">
+		{% for comment in comments %}
+			<div class="list-group-item align-items-start">
+				<div class="d-flex w-100 justify-content-between">
+					<a href="/demos/forum/user/{{ comment.username }}" class="h6 mb-1">{{ comment.username }}</a>
+					<small>{{ comment.date }} {{ comment.time }}</small>
+				</div>
+
+				<p class="mb-1">{{ comment.content }}</p>
+			</div>
+		{% endfor %}
+	</div>
+
+	<br/>
 </div>
 
 <script>

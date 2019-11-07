@@ -142,7 +142,7 @@ def demos_forum_signup():
 @forum_require_auth
 def demos_forum():
     if request.method == 'GET':
-        posts = forum_db.post_gather(config['demos']['forum']['max_posts'])
+        posts = forum_db.post_gather(config['demos']['forum']['max_posts'], comments=True)
         user = forum_db.user_fetch(session['forum_username'])
         return render_forum_template(
             '/demos/forum/home.html',
@@ -168,14 +168,18 @@ def demos_forum_post(pkey):
     if request.method == 'GET':
         post = forum_db.post_fetch(pkey)
         user = forum_db.user_fetch(session['forum_username'])
+        max_comments = config['demos']['forum']['max_comments']
         return render_forum_template(
             '/demos/forum/post.html',
             username=session['forum_username'],
-            post=post,
-            user=user
+            comments=forum_db.comment_fetch(pkey, limit=max_comments),
+            post=post, user=user
         )
     elif request.method == 'POST':
-        return 'ok'
+        username = session['forum_username']
+        content = request.values.get('comment')
+        forum_db.comment_add(pkey, username, content)
+        return redirect('/demos/forum/post/' + pkey)
     else:
         abort(405)
 

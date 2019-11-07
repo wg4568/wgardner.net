@@ -16,7 +16,7 @@ def with_database(func):
 
 class Forum:
     class Post:
-        def __init__(self, raw):
+        def __init__(self, raw, comments=None):
             self._raw = raw
             self.pkey = raw[0]
             self.created = int(raw[1])
@@ -26,6 +26,7 @@ class Forum:
             self.likes = int(raw[5])
             self.deleted = bool(raw[6])
             self.image = raw[7]
+            self.comments = comments
 
             self._timestamp = dt.utcfromtimestamp(self.created)
             self.date = self._timestamp.strftime('%m/%d/%y')
@@ -129,17 +130,27 @@ class Forum:
         return post_pkey
     
     @with_database
-    def post_fetch(self, cur, post_pkey):
+    def post_fetch(self, cur, post_pkey, comments=False, comments_limit=100):
         query = 'SELECT * FROM posts WHERE post_pkey=?'
         resp = cur.execute(query, (post_pkey,))
 
-        return Forum.Post(resp.fetchone())
+        _comments = None
+        if comments:
+            _comments = self.comment_fetch(post_pkey, limit=comments_limit)
+
+        return Forum.Post(resp.fetchone(), comments=_comments)
 
     @with_database
-    def post_gather(self, cur, quantity, deleted=False):
+    def post_gather(self, cur, quantity, deleted=False, comments=False, comments_limit=100):
         query = 'SELECT * FROM posts WHERE deleted!=? ORDER BY create_date DESC LIMIT ?'
         resp = cur.execute(query, (not deleted, quantity))
-        return [ Forum.Post(a) for a in resp.fetchall() ]
+        posts = []
+        for post in resp.fetchall():
+            _comments = None
+            if comments:
+                _comments = self.comment_fetch(post[0], limit=comments_limit)
+            posts.append(Forum.Post(post, comments=_comments))
+        return posts
 
     @with_database
     def post_delete(self, cur, post_pkey, deleted=True):
@@ -181,8 +192,8 @@ class Forum:
     @with_database
     def comment_add(self, cur, post_pkey, username, content):
         create_date = int(time.time())
-        query = 'INSERT INTO comments VALUES (?, ?, ?, ?, ?)'
-        cur.execute(query, (post_pkey, username, create_date, content, false))
+        query = 'INSERT INTO comments VALUES (?, ?, ?, ?)'
+        cur.execute(query, (post_pkey, username, create_date, content))
     
     @with_database
     def comment_fetch(self, cur, post_pkey, limit=100):

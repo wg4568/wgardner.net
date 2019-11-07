@@ -7,7 +7,8 @@
 
     "demos": {
         "forum": {
-            "max_posts": 20
+            "max_posts": 50,
+            "max_comments": 100
         }
     }
 }

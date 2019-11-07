@@ -62,11 +62,20 @@
         {% endif %}
         <div class="card-body">
             <a href="/demos/forum/post/{{ post.pkey }}" class="h5 card-title">{{ post.title }}</a>
-            <h6 class="card-subtitle mt-1 mb-2 text-muted disable-select" onclick="like_post('{{ post.pkey }}')">
-                <i class="icon-heart {% if post.pkey in user.liked_posts %}liked{% endif %}" id="heart-{{ post.pkey }}"></i>
-                <span id="likes-{{ post.pkey }}" class="{% if post.pkey in user.liked_posts %}liked{% endif %}">{{ post.likes }}</span>
-            </h6>
             <p class="card-text">{{ post.content }}</p>
+
+            <h6 class="card-subtitle mt-1 mb-2 text-muted disable-select row">
+                <div class="col-md-3" onclick="like_post('{{ post.pkey }}')">
+                    <i class="icon-heart {% if post.pkey in user.liked_posts %}liked{% endif %}" id="heart-{{ post.pkey }}"></i>
+                    <span id="likes-{{ post.pkey }}" class="{% if post.pkey in user.liked_posts %}liked{% endif %}">{{ post.likes }}</span>
+                </div>
+                
+                <div class="col-md-9">
+                    <i class="icon-comment"></i>
+                    <span>{{ post.comments | length }}</span>
+                </div>
+            </h6>
+
         </div>
         
         <div class="card-footer text-muted">
