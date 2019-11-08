@@ -202,7 +202,7 @@ def demos_forum_user(username):
         return render_forum_template(
             '/demos/forum/user.html',
             username=session['forum_username'],
-            active_user=forum_db.user_fetch(session['username']),
+            active_user=forum_db.user_fetch(session['forum_username']),
             stats=forum_db.user_stats(username),
             user=user, posts=posts
         )
