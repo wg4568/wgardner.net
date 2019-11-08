@@ -92,7 +92,7 @@ def render_forum_template(template, **kwargs):
 
 @app.before_request
 def before_request():
-    if 'logged_in' not in session:
+    if 'forum_logged_in' not in session:
         session['forum_logged_in'] = False
         session['forum_username'] = None
 
