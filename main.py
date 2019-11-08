@@ -74,7 +74,7 @@ def forum_require_auth(func):
         if session['forum_logged_in']:
             return func(*args, **kwargs)
         else:
-            return redirect('/demos/forum/login?msg=2')
+            return redirect('/demos/forum/login')
     wrapper.__name__ = func.__name__
     return wrapper
 
