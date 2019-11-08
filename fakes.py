@@ -35,7 +35,8 @@ for _ in range(N_POSTS):
     content = ' '.join(fake.paragraphs(nb=body_len))
     image = None
     if random.random() < 0.7:
-        url = 'https://pixabay.com/images/search/' + title.split()[0]
+        url = 'https://www.pexels.com/search/' + title.split()[0]
+        # url = 'https://pixabay.com/images/search/' + title.split()[0]
         resp = requests.get(url)
         soup = bs4.BeautifulSoup(resp.text, features='html.parser')
 

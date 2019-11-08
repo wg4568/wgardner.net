@@ -37,7 +37,7 @@ else:
 # SITE SECTION: static frontend site
 @app.route('/')
 def index():
-    return redirect('/site/about')
+    return redirect('/site/home')
 
 @app.route('/site/<page>')
 def site(page):
