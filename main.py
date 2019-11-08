@@ -4,6 +4,7 @@ import bs4
 import json
 import database
 import os
+import secrets
 import sqlite3
 
 # Render html using template file
