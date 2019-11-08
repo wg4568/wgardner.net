@@ -62,5 +62,8 @@ for _ in range(N_LIKES):
     forum_db.post_like(username, pkey)
     print('Like', _, username, pkey)
 
+try: forum_db.user_add('william', 'password', admin=True)
+except sqlite3.IntegrityError: pass
+
 print(usernames)
 print(post_pkeys)

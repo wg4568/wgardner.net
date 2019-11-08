@@ -28,9 +28,6 @@ with open('resources/config.json') as f:
 if config['debug']:
     app.secret_key = 'super_secret_debug_key'
     forum_db.debug = True
-
-    try: forum_db.user_add('william', 'password', admin=True)
-    except sqlite3.IntegrityError: pass
 else:
     app.secret_key = secrets.token_hex(config['secret_length'])
 
