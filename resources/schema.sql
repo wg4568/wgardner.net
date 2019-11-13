@@ -8,7 +8,7 @@ CREATE TABLE users (
 CREATE TABLE posts (
     post_pkey       TEXT NOT NULL UNIQUE,
     create_date     INTEGER NOT NULL,
-    username        TEXT NOT NULL,pos
+    username        TEXT NOT NULL,
     title           TEXT NOT NULL,
     content         TEXT NOT NULL,
     likes           INTEGER NOT NULL,
