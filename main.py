@@ -9,9 +9,9 @@ import sqlite3
 
 # Render html using template file
 def render_site_template(template, **kwargs):
-    page = template.split('.')[-2].split('/')[-1]
-    page_title = page.capitalize()
-    content = render_template(template, page=page, **kwargs)
+    page = template.split('.')[-2]
+    page_title = page.split('/')[-1].replace('_', ' ').title()
+    content = render_template('site/' + template, page=page, **kwargs)
     return render_template(
         'site/template.html', title=page_title,
         page=page, content=content,  **kwargs)
@@ -19,7 +19,17 @@ def render_site_template(template, **kwargs):
 # Initialize globals
 app = Flask(__name__)
 forum_db = database.Forum('resources/forum.db', schema='resources/schema.sql')
-pages = [ a.split('.')[0] for a in os.listdir('templates/site/') ]
+
+pages = [
+    'home',
+    'services',
+    'portfolio',
+    'contact',
+    'services/tutoring',
+    'services/web_dev',
+    'services/discord',
+    'services/more'
+]
 
 # Load configuration from file
 with open('resources/config.json') as f:
@@ -37,10 +47,10 @@ else:
 def index():
     return redirect('/site/home')
 
-@app.route('/site/<page>')
+@app.route('/site/<path:page>')
 def site(page):
     if page not in pages: abort(404)
-    else: return render_site_template('site/%s.html' % page)
+    else: return render_site_template('%s.html' % page)
 
 # SITE SECTION: Stock checker live demo
 @app.route('/demos/stocks', methods=['GET', 'POST'])

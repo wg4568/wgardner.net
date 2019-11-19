@@ -37,25 +37,32 @@
     <body>
         <div class="container">
             <div class="header clearfix">
-                <nav>
-                    <ul class="nav nav-pills float-right">
-                        <li class="nav-item">
-                            <a class="nav-link {%if page=='home'%}active{%endif%}" href="/site/home">Home</a>
-                        </li>
+                <ul class="nav nav-pills float-right">
+                    <li class="nav-item">
+                        <a class="nav-link {%if page=='home'%}active{%endif%}" href="/site/home">Home</a>
+                    </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link {%if page=='services'%}active{%endif%}" href="/site/services">Services</a>
-                        </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle {%if page.startswith('services')%}active{%endif%}"
+                           data-toggle="dropdown" href="#" role="button">Services</a>
 
-                        <li class="nav-item">
-                            <a class="nav-link {%if page=='portfolio'%}active{%endif%}" href="/site/portfolio">Portfolio</a>
-                        </li>
+                        <div class="dropdown-menu">
+                            <a class="dropdown-item" href="/site/services/tutoring">Tutoring</a>
+                            <a class="dropdown-item" href="/site/services/web_dev">Web Development</a>
+                            <a class="dropdown-item" href="/site/services/discord">Discord Bots</a>
+                            <a class="dropdown-item" href="/site/services/more">More</a>
+                        </div>
+                    </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link {%if page=='contact'%}active{%endif%}" href="/site/contact">Contact</a>
-                        </li>
-                    </ul>
-                </nav>
+                    <li class="nav-item">
+                        <a class="nav-link {%if page=='portfolio'%}active{%endif%}" href="/site/portfolio">Portfolio</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link {%if page=='contact'%}active{%endif%}" href="/site/contact">Contact</a>
+                    </li>
+                </ul>
+
                 <h3 class="text-muted">William Gardner</h3>
             </div>
 
