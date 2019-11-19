@@ -7,6 +7,13 @@ import os
 import secrets
 import sqlite3
 
+# Move cwd to file location
+abspath = os.path.abspath(__file__)
+print(abspath)
+dname = os.path.dirname(abspath)
+print(dname)
+os.chdir(dname)
+
 # Render html using template file
 def render_site_template(template, **kwargs):
     page = template.split('.')[-2]

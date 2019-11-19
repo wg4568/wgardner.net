@@ -7,10 +7,10 @@ import requests
 import random
 import bs4
 
-with open('secrets.json') as f:
+with open('resources/secrets.json') as f:
     secrets = json.load(f)
 
-forum_db = Forum('forum.db', schema='schema.sql')
+forum_db = Forum('resources/forum.db', schema='resources/schema.sql')
 fake = Faker()
 
 usernames = []
