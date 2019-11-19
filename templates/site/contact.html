@@ -73,3 +73,44 @@
 <p>
     Alternatively, use this form to reach me directly.
 </p>
+
+<div class="bg-light rounded p-3">
+    <form>
+        <div class="form-group row" method="POST">
+            <label class="col-sm-2 col-form-label text-right">Name</label>
+            <div class="col-sm-10">
+                <input type="text" name="name" class="form-control">
+            </div>
+        </div>
+
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label text-right">Email</label>
+            <div class="col-sm-10">
+                <input type="email" name="email" class="form-control">
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label text-right">Service</label>
+            <div class="col-sm-10">
+                <select class="custom-select" name="service">
+                    <option value="tutoring">Tutoring</option>
+                    <option value="web_dev">Web Development</option>
+                    <option value="discord">Discord Bot</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="form-group row">
+            <label class="col-sm-2 col-form-label text-right">Message</label>
+            <div class="col-sm-10" name="message">
+                <textarea class="form-control"></textarea>
+            </div>
+        </div>
+        
+        <div class="row">
+            <button type="submit" class="btn btn-primary offset-sm-10 col-sm-2">Send</button>
+        </div>
+    </form>
+</div>
