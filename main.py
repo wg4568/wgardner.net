@@ -7,6 +7,9 @@ import os
 import secrets
 import sqlite3
 
+here = os.path.dirname(__file__)
+def path(rel): return os.path.join(here, rel)
+
 # Render html using template file
 def render_site_template(template, **kwargs):
     page = template.split('.')[-2]
@@ -18,7 +21,7 @@ def render_site_template(template, **kwargs):
 
 # Initialize globals
 app = Flask(__name__)
-forum_db = database.Forum('resources/forum.db', schema='resources/schema.sql')
+forum_db = database.Forum(path('resources/forum.db'), schema=path('resources/schema.sql'))
 
 pages = [
     'home',
@@ -32,7 +35,7 @@ pages = [
 ]
 
 # Load configuration from file
-with open('resources/config.json') as f:
+with open(path('resources/config.json')) as f:
     config = json.load(f)
 
 # Generate secure secret key for session encryption
@@ -219,9 +222,10 @@ def demos_forum_user(username):
     else:
         abort(405)
 
-# Launch the application
-app.run(
-    host=config['host'],
-    port=config['port'],
-    debug=config['debug']
-)
+if __name__ == '__main__':
+    # Launch the application
+    app.run(
+        host=config['host'],
+        port=config['port'],
+        debug=config['debug']
+    )
