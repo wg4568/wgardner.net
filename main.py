@@ -38,13 +38,6 @@ pages = [
 with open(path('resources/config.json')) as f:
     config = json.load(f)
 
-# Generate secure secret key for session encryption
-if config['debug']:
-    app.secret_key = 'super_secret_debug_key'
-    forum_db.debug = True
-else:
-    app.secret_key = secrets.token_hex(config['secret_length'])
-
 # SITE SECTION: static frontend site
 @app.route('/')
 def index():
@@ -223,6 +216,13 @@ def demos_forum_user(username):
         abort(405)
 
 if __name__ == '__main__':
+    # Generate secure secret key for session encryption
+    if config['debug']:
+        app.secret_key = 'super_secret_debug_key'
+        forum_db.debug = True
+    else:
+        app.secret_key = secrets.token_hex(config['secret_length'])
+
     # Launch the application
     app.run(
         host=config['host'],
